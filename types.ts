@@ -17,4 +17,6 @@ export interface Restaurant {
   name: string;
   bioSummary: string;
   reviewSummary: string;
+  rating: string;
+  highlight: string;
 }

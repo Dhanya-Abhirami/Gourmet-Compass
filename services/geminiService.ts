@@ -17,10 +17,16 @@ export async function fetchRestaurantRecommendations(
 ) {
   const model = 'gemini-2.5-flash';
   
-  let prompt = `Find the best strictly pure vegetarian restaurants for "${foodQuery}" within a 5km radius of ${locationQuery}. Do not recommend places that are not exclusively vegetarian. Format the response as a list. For each restaurant, provide the name, a summary from its bio/description, and a separate summary from user reviews. Use '@@@' as a separator between each restaurant. For each restaurant's details, use the exact format on separate lines: "name:: [Restaurant Name]", "bioSummary:: [Bio Summary]", "reviewSummary:: [Review Summary]". Do not use any markdown formatting like ** or ###.`;
+  let prompt = `Find at least 5 of the best strictly pure vegetarian restaurants for "${foodQuery}" within a 5km radius of ${locationQuery}. IMPORTANT: Only include restaurants with a rating of 4 stars or higher. Do not recommend places that are not exclusively vegetarian. Format the response as a list. For each restaurant, provide the name, its star rating, a short highlight sentence explaining why it's a great choice, a summary from its bio/description, and a separate summary from user reviews. Use '@@@' as a separator between each restaurant. For each restaurant's details, use the exact format on separate lines: "name:: [Restaurant Name]", "rating:: [e.g., 4.5]", "highlight:: [Highlight sentence]", "bioSummary:: [Bio Summary]", "reviewSummary:: [Review Summary]". Do not use any markdown formatting like ** or ###.`;
 
-  if (diningStyle) {
-    prompt += ` The user prefers a ${diningStyle.toLowerCase()} dining experience.`;
+  if (diningStyle && diningStyle !== 'Any') {
+    if (diningStyle === 'Buffet') {
+      prompt += ` IMPORTANT: The user wants a restaurant that is strictly buffet-style. Do NOT recommend restaurants that also offer à la carte dining. The primary dining format must be buffet.`;
+    } else if (diningStyle === 'Unlimited Thali') {
+      prompt += ` IMPORTANT: The user wants a restaurant that specializes in an unlimited thali system. Do NOT recommend restaurants where thali is just one option on a larger à la carte menu.`;
+    } else if (diningStyle === 'À la carte') {
+      prompt += ` The user prefers an à la carte dining experience.`;
+    }
   }
   
   if (price) {
@@ -64,17 +70,22 @@ export async function fetchRestaurantRecommendations(
                 const [key, ...valueParts] = line.split('::');
                 const value = valueParts.join('::').trim();
                 if (key && value) {
-                    if (key.trim() === 'name') {
+                    const trimmedKey = key.trim();
+                    if (trimmedKey === 'name') {
                         restaurant.name = value;
-                    } else if (key.trim() === 'bioSummary') {
+                    } else if (trimmedKey === 'bioSummary') {
                         restaurant.bioSummary = value;
-                    } else if (key.trim() === 'reviewSummary') {
+                    } else if (trimmedKey === 'reviewSummary') {
                         restaurant.reviewSummary = value;
+                    } else if (trimmedKey === 'rating') {
+                        restaurant.rating = value;
+                    } else if (trimmedKey === 'highlight') {
+                        restaurant.highlight = value;
                     }
                 }
             });
 
-            if (restaurant.name && restaurant.bioSummary && restaurant.reviewSummary) {
+            if (restaurant.name && restaurant.bioSummary && restaurant.reviewSummary && restaurant.rating && restaurant.highlight) {
                 recommendations.push(restaurant as Restaurant);
             }
         }

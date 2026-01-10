@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import type { GroundingChunk, UserLocation, Restaurant } from './types';
 import { fetchRestaurantRecommendations } from './services/geminiService';
@@ -18,7 +19,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
-  const [diningStyle, setDiningStyle] = useState<string>('À la carte');
+  const [diningStyle, setDiningStyle] = useState<string>('Any');
   const [price, setPrice] = useState<string>('');
 
   useEffect(() => {
@@ -28,7 +29,6 @@ const App: React.FC = () => {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         });
-        setLocationQuery('my current location');
       },
       (error) => {
         console.warn(`Geolocation error: ${error.message}`);
@@ -62,7 +62,7 @@ const App: React.FC = () => {
       } else {
         setError('Could not get recommendations. Please try a different search.');
       }
-    // FIX: Add missing closing brace for the try block. This resolves a syntax error that caused subsequent variables to be out of scope.
+    // FIX: The `catch` block below had invalid arrow function syntax (`=>`), which caused all subsequent errors.
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
       console.error(e);
@@ -71,6 +71,14 @@ const App: React.FC = () => {
       setIsLoading(false);
     }
   }, [locationQuery, foodQuery, userLocation, diningStyle, price]);
+  
+  const handleNearMeClick = useCallback(() => {
+      if(userLocation) {
+          setLocationQuery('my current location');
+      } else {
+          setError('Could not get your location. Please enable location services or enter a location manually.');
+      }
+  }, [userLocation]);
 
   return (
     <div className="min-h-screen bg-brand-dark flex flex-col items-center p-4 sm:p-6 lg:p-8">
@@ -88,6 +96,7 @@ const App: React.FC = () => {
             setDiningStyle={setDiningStyle}
             price={price}
             setPrice={setPrice}
+            onNearMeClick={handleNearMeClick}
           />
           <div className="mt-8">
             {initialLoad && <WelcomeMessage />}

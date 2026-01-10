@@ -12,6 +12,7 @@ interface SearchFormProps {
   setDiningStyle: (value: string) => void;
   price: string;
   setPrice: (value: string) => void;
+  onNearMeClick: () => void;
 }
 
 const SearchForm: React.FC<SearchFormProps> = ({
@@ -25,6 +26,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   setDiningStyle,
   price,
   setPrice,
+  onNearMeClick,
 }) => {
     
   const handleSubmit = (e: React.FormEvent) => {
@@ -44,19 +46,49 @@ const SearchForm: React.FC<SearchFormProps> = ({
             onChange={(e) => setFoodQuery(e.target.value)}
             placeholder="e.g., 'cozy italian pasta' or 'trendy tacos'"
             className="w-full px-4 py-2 bg-brand-dark border border-stone-600 rounded-md focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-colors"
+            required
           />
         </div>
         <div>
           <label htmlFor="location" className="block text-sm font-medium text-brand-muted mb-1">Location</label>
-          <input
-            id="location"
-            type="text"
-            value={locationQuery}
-            onChange={(e) => setLocationQuery(e.target.value)}
-            placeholder="e.g., 'Brooklyn, NY' or 'near me'"
-            className="w-full px-4 py-2 bg-brand-dark border border-stone-600 rounded-md focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-colors"
-          />
+           <div className="relative flex items-center">
+              <input
+                id="location"
+                type="text"
+                value={locationQuery}
+                onChange={(e) => setLocationQuery(e.target.value)}
+                placeholder="e.g., 'Brooklyn, NY'"
+                className="w-full px-4 py-2 bg-brand-dark border border-stone-600 rounded-md focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-colors pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={onNearMeClick}
+                className="absolute right-0 mr-3 text-brand-muted hover:text-brand-secondary transition-colors"
+                aria-label="Use my current location"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="1.5" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 2v2m0 16v2m-8-10H2m20 0h-2" />
+                </svg>
+              </button>
+           </div>
         </div>
+      </div>
+       <div className="pt-2">
+          <label className="block text-sm font-medium text-brand-muted mb-2 text-center">Or pick a vibe...</label>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {['Casual Dining', 'Family Gathering', 'Fine Dining', 'Quick Bite'].map((vibe) => (
+              <button
+                key={vibe}
+                type="button"
+                onClick={() => setFoodQuery(vibe)}
+                className="px-4 py-1.5 bg-stone-700 text-brand-light rounded-full text-sm hover:bg-brand-secondary hover:text-brand-dark transition-colors"
+              >
+                {vibe}
+              </button>
+            ))}
+          </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 mt-4 border-t border-stone-700">
@@ -68,6 +100,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
             onChange={(e) => setDiningStyle(e.target.value)}
             className="w-full px-4 py-2 bg-brand-dark border border-stone-600 rounded-md focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-colors"
           >
+            <option>Any</option>
             <option>À la carte</option>
             <option>Buffet</option>
             <option>Unlimited Thali</option>

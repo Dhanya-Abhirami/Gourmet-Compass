@@ -1,6 +1,7 @@
 
 import React, { useRef } from 'react';
 import type { GroundingChunk, Restaurant } from '../types';
+import StarRating from './StarRating';
 
 interface ResultsDisplayProps {
   recommendations: Restaurant[];
@@ -56,26 +57,36 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ recommendations, source
         {recommendations.map((restaurant, index) => {
           const link = findSourceForRestaurant(restaurant.name, sources);
           return (
-            <div key={index} className="flex-shrink-0 w-[90%] md:w-[80%] snap-center bg-stone-800 rounded-lg shadow-xl p-6 border border-stone-700">
-              <h3 className="text-xl font-bold text-brand-secondary mb-3">
-                {link ? (
-                  <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-2">
-                    {restaurant.name}
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                  </a>
-                ) : (
-                  restaurant.name
-                )}
-              </h3>
+            <div key={index} className="flex flex-col gap-4 flex-shrink-0 w-[90%] md:w-[80%] snap-center bg-stone-800 rounded-lg shadow-xl p-6 border border-stone-700">
+              <div className="flex justify-between items-start">
+                <h3 className="text-xl font-bold text-brand-secondary mb-1 w-4/5">
+                  {link ? (
+                    <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-2">
+                      {restaurant.name}
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                    </a>
+                  ) : (
+                    restaurant.name
+                  )}
+                </h3>
+                 <div className="flex-shrink-0 flex items-center gap-1 bg-brand-dark px-2 py-1 rounded-md text-sm">
+                    <span className="text-amber-400 font-bold">{restaurant.rating}</span>
+                    <StarRating rating={restaurant.rating} />
+                </div>
+              </div>
 
-              <div className="space-y-4">
+              <blockquote className="border-l-4 border-brand-secondary pl-4 italic text-brand-light">
+                "{restaurant.highlight}"
+              </blockquote>
+
+              <div className="space-y-4 text-sm">
                 <div>
                   <h4 className="font-semibold text-brand-muted mb-1">Bio Summary</h4>
-                  <p className="text-brand-light text-sm">{restaurant.bioSummary}</p>
+                  <p className="text-brand-light">{restaurant.bioSummary}</p>
                 </div>
                 <div>
                   <h4 className="font-semibold text-brand-muted mb-1">Review Summary</h4>
-                  <p className="text-brand-light text-sm">{restaurant.reviewSummary}</p>
+                  <p className="text-brand-light">{restaurant.reviewSummary}</p>
                 </div>
               </div>
             </div>
