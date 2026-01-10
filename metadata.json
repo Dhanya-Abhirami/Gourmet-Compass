@@ -1,0 +1,7 @@
+{
+  "name": "Restaurant Recommender",
+  "description": "An intelligent restaurant finder that leverages Google Maps data to provide personalized recommendations based on your desired food and vibe.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
